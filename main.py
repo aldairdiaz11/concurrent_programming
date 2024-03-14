@@ -18,7 +18,9 @@ def main_sequential(list_1: iter, list_2: iter, list_3: iter) -> None:
     """Main wrapper for sequential example"""
     s = time.perf_counter()
 
-    # TODO: complete this part
+    calc_average(list_1)
+    calc_average(list_2)
+    calc_average(list_3)
 
     elapsed = time.perf_counter() - s
     print(f"Sequential programming Elapsed Time: {elapsed} seconds")
@@ -38,7 +40,9 @@ async def main_async(list_1: iter, list_2: iter, list_3: iter) -> None:
     """Main wrapper for asynchronous example"""
     s = time.perf_counter()
 
-    # TODO: complete this part
+    tasks = [calc_average_async(list_1), calc_average_async(list_2), calc_average_async(list_3)]
+
+    await asyncio.gather(*tasks)
 
     elapsed = time.perf_counter() - s
     print(f"Asynchronous programming Elapsed Time: {elapsed} seconds")
