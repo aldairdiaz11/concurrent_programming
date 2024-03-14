@@ -48,11 +48,21 @@ async def main_async(list_1: iter, list_2: iter, list_3: iter) -> None:
     print(f"Asynchronous programming Elapsed Time: {elapsed} seconds")
 
 
-async def main_threading(list_1: iter, list_2: iter, list_3: iter) -> None:
+def main_threading(list_1: iter, list_2: iter, list_3: iter) -> None:
     """Main wrapper for threading example"""
     s = time.perf_counter()
 
-    # TODO: complete this part
+    lists = [list_1, list_2, list_3]
+    threads = []
+
+    for li in range(len(lists)):
+        x = threading.Thread(target=calc_average_async, args=(lists[li], ))
+        threads.append(x)
+
+        x.start()
+
+    for thread in threads:
+        thread.join()
 
     elapsed = time.perf_counter() - s
     print(f"Threading programming Elapsed Time: {elapsed} seconds")
