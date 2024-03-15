@@ -1,3 +1,4 @@
+import sys
 import time
 import threading
 import asyncio
@@ -38,13 +39,12 @@ async def calc_average_async(num: iter) -> float:
 
 async def main_async(list_1: iter, list_2: iter, list_3: iter) -> None:
     """Main wrapper for asynchronous example"""
+
     s = time.perf_counter()
-
     tasks = [calc_average_async(list_1), calc_average_async(list_2), calc_average_async(list_3)]
-
     await asyncio.gather(*tasks)
-
     elapsed = time.perf_counter() - s
+
     print(f"Asynchronous programming Elapsed Time: {elapsed} seconds")
 
 
@@ -53,12 +53,11 @@ def main_threading(list_1: iter, list_2: iter, list_3: iter) -> None:
     s = time.perf_counter()
 
     lists = [list_1, list_2, list_3]
-    threads = []
+    threads = list()
 
     for li in range(len(lists)):
-        x = threading.Thread(target=calc_average_async, args=(lists[li], ))
+        x = threading.Thread(target=calc_average, args=(lists[li],))
         threads.append(x)
-
         x.start()
 
     for thread in threads:
@@ -68,11 +67,17 @@ def main_threading(list_1: iter, list_2: iter, list_3: iter) -> None:
     print(f"Threading programming Elapsed Time: {elapsed} seconds")
 
 
-async def main_multiprocessing(list_1: iter, list_2: iter, list_3: iter) -> None:
+def main_multiprocessing(list_1: iter, list_2: iter, list_3: iter) -> None:
     """Main wrapper for threading example"""
     s = time.perf_counter()
 
-    # TODO: complete this part
+    lists = [list_1, list_2, list_3]
+    processes = [Process(target=calc_average, args=(lists[n],)) for n in range(len(lists))]
+
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
 
     elapsed = time.perf_counter() - s
     print(f"Multiprocessing Elapsed Time: {elapsed} seconds")
@@ -83,7 +88,16 @@ if __name__ == "__main__":  # Need to use this if-statement so multiprocessing d
     l2 = [2, 4, 6, 8, 10]
     l3 = [1, 3, 5, 7, 9, 11]
     main_sequential(l1, l2, l3)
-    loop = asyncio.get_event_loop()
+
+    if sys.version_info >= (3, 10):  # Python 3.10+ way of handling asyncio event loop
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+    else:
+        loop = asyncio.get_event_loop()
+
     loop.run_until_complete(main_async(l1, l2, l3))
     main_threading(l1, l2, l3)
     main_multiprocessing(l1, l2, l3)
